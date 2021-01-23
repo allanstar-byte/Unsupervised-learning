@@ -1,0 +1,231 @@
+---
+title: 'Part 2: Feature Selection'
+author: "Allan Mutisya"
+date: "1/22/2021"
+output: html_document
+---
+```{r}
+#  locale workaround
+my_locale <- Sys.getlocale("LC_ALL")
+Sys.setlocale("LC_ALL", my_locale)
+```
+# Advertisement
+
+## 1. Defining the question
+
+### a) Specifying the Question
+performing various unsupervised learning techniques and later providing recommendations based on your insights to the marketing departent
+
+### b) Defining the Metric for Success
+
+The analysis will be considered a success when the high dimensional data will be reduced to a low dimension data.
+
+### c) Understanding the context
+
+The role of the analysis is to inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales.
+
+### d) Recording the Experimental Design
+
+1. Defining the research question
+
+2. Data Understanding
+
+3. Data cleaning
+
+4. Modeling
+
+5. Recommendations
+
+### e) Data Relevance
+
+The datasets are large enough to be used for Exploratory Data Analysis, thus promising better outcomes.
+
+### f) Reading the Data
+
+```{r}
+# loading the dataset
+library(readr)
+supa <- read_csv("C:/Users/ALLANOOH/Documents/moringa/R/IP's/Carrefour/Supermarket_Dataset_1 - Sales Data.csv")
+```
+
+
+```{r}
+# pre-viewing the dataset
+head(supa)
+
+```
+
+
+
+### 2. Data Understanding
+
+```{r}
+# checking for the structure of the dataset
+str(supa)
+```
+
+
+
+The dataset is comprised of numeric and character data types
+
+
+
+### 3. Data cleaning
+
+```{r}
+# renaming columns to remove in-between spaces
+names(supa)[names(supa) == "Invoice ID"] <- "Invoice_ID"
+names(supa)[names(supa) == "Customer type"] <- "Customer_type"
+names(supa)[names(supa) == "Product line"] <- "Product_line"
+names(supa)[names(supa) == "Unit price"] <- "Unit_price"
+names(supa)[names(supa) == "gross margin percentage"] <- "gross_margin_percentage"
+head(supa)
+```
+
+
+
+
+```{r}
+# dropping invoice id and branch columns since they are irrelevant in our analysis
+supa_1 <- subset(supa, select = -c(Invoice_ID, Branch, Date, Time))
+head(supa_1)
+```
+
+
+
+```{r}
+# label encoding the cartegorical variables
+
+df<- supa_1
+
+head(df)
+
+df$Customer_type  <- factor(df$Customer_type)
+
+df$Gender <- factor(df$Gender)
+
+df$Product_line <- factor((df$Product_line))
+
+df$Payment <- factor(df$Payment)
+
+vec <- sapply(df, is.factor)
+
+catlevels <- sapply(df[vec], levels)
+
+#store the levels for each category
+#level appearing first is coded as 1, second as 2 so on
+
+df <- sapply(df, as.numeric)
+
+class(df) #matrix
+
+df <- data.frame(df) 
+
+#converting back to dataframe
+
+head(df)
+
+```
+
+### 4 Modeling
+
+#### Feature selection
+
+##### a) Filter Methods 
+
+```{r}
+# loading libraries
+library(caret)
+
+library(corrplot)
+```
+
+```{r}
+# Calculating the correlation matrix
+# ---
+#
+correlationMatrix <- cor(df)
+
+# Find attributes that are highly correlated
+# ---
+#
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.75)
+
+# Highly correlated attributes
+# ---
+# 
+highlyCorrelated
+
+names(df[,highlyCorrelated])
+
+```
+
+We can observe that Tax, Cogs, gross.income columns have a high correlaton according to the filtering method
+
+
+
+
+#### b) Wrapper Methods 
+
+```{r}
+# loading the required packages
+
+library(clustvarsel)
+
+library(mclust)
+
+
+```
+
+
+```{r}
+
+# First we look at the result obtained using the function Mclust from the mclust package, with
+# the best model selected by BIC for clustering on all the variables, allowing all possible
+# parameterizations and the number of groups to range over 1 to 5:
+df2 <- subset(df, select = -c(Total))
+Class <- df$Total
+
+mod1 <- Mclust(df2, G = 1:5)
+summary(mod1)
+
+
+```
+
+
+
+
+```{r}
+# The estimated maximum a posteriori (MAP) classification is obtained from mod1$classification, # so a table comparing the estimated and the true classifications, the corresponding
+# misclassification error rate and the adjusted Rand index (ARI), can be obtained as follows:
+
+table(Class, mod1$classification)
+```
+
+```{r}
+# The algorithm for selecting the variables that are useful for clustering can be run with the  # following code:
+
+#(out <- clustvarsel(df2, G = 1:5))
+```
+
+
+```{r}
+plot(mod1,c("classification"))
+```
+
+
+
+### Recomendations
+
+We can observe that Tax, Cogs, gross.income columns have a high correlaton according to the filtering method and wrapper methods
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,210 @@
+---
+title: 'Part 3: Association Rules'
+author: "Allan Mutisya"
+date: "1/23/2021"
+output: html_document
+---
+
+```{r}
+#  locale workaround
+my_locale <- Sys.getlocale("LC_ALL")
+Sys.setlocale("LC_ALL", my_locale)
+```
+# Advertisement
+
+## 1. Defining the question
+
+### a) Specifying the Question
+performing various unsupervised learning techniques and later providing recommendations based on your insights to the marketing departent
+
+### b) Defining the Metric for Success
+
+The analysis will be considered a success when the high dimensional data will be reduced to a low dimension data.
+
+### c) Understanding the context
+
+The role of the analysis is to inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales.
+
+### d) Recording the Experimental Design
+
+1. Defining the research question
+
+2. Data Understanding
+
+3. Data cleaning
+
+4. Modeling
+
+5. Recommendations
+
+### e) Data Relevance
+
+The datasets are large enough to be used for Exploratory Data Analysis, thus promising better outcomes.
+
+### f) Reading the Data
+
+
+```{r}
+# Loading the arules library
+#
+library(arules)
+```
+
+```{r}
+# Loading our transactions dataset from our csv file
+# ---
+# We will use read.transactions fuction which will load data from comma-separated files 
+# and convert them to the class transactions, which is the kind of data that 
+# we will require while working with models of association rules
+# ---
+# 
+Transactions <-read.transactions("C:/Users/ALLANOOH/Documents/moringa/R/IP's/Carrefour/Supermarket_Sales_Dataset II.csv")
+
+```
+
+
+
+```{r}
+# previewing the datasets
+head(Transactions)
+```
+
+```{r}
+# Verifying the object's class
+# ---
+# This should show us transactions as the type of data that we will need
+# ---
+# 
+class(Transactions)
+```
+
+
+
+
+
+```{r}
+# Previewing our first 5 transactions
+#
+inspect(Transactions[1:5])
+```
+
+
+```{r}
+# If we wanted to preview the items that make up our dataset,
+# alternatively we can do the following
+# ---
+# 
+items<-as.data.frame(itemLabels(Transactions))
+colnames(items) <- "Item"
+head(items, 10)    
+```
+
+
+
+
+
+```{r}
+# Generating a summary of the transaction dataset
+# ---
+# This would give us some information such as the most purchased items, 
+# distribution of the item sets (no. of items purchased in each transaction), etc.
+# ---
+# 
+summary(Transactions)
+```
+
+```{r}
+# Exploring the frequency of some articles 
+# i.e. transacations ranging from 8 to 10 and performing 
+# some operation in percentage terms of the total transactions 
+# 
+itemFrequency(Transactions[, 8:10],type = "absolute")
+round(itemFrequency(Transactions[, 8:10],type = "relative")*100,2)
+```
+
+
+```{r}
+# Producing a chart of frequencies and fitering 
+# to consider only items with a minimum percentage 
+# of support/ considering a top x of items
+# ---
+# Displaying top 10 most common items in the transactions dataset 
+# and the items whose relative importance is at least 10%
+# 
+par(mfrow = c(1, 2))
+
+# plot the frequency of items
+itemFrequencyPlot(Transactions, topN = 10,col="darkgreen")
+itemFrequencyPlot(Transactions, support = 0.1,col="darkred")
+```
+
+
+
+```{r}
+# Building a model based on association rules 
+# using the apriori function 
+# ---
+# We use Min Support as 0.001 and confidence as 0.8
+# ---
+# 
+rules <- apriori (Transactions, parameter = list(supp = 0.001, conf = 0.8))
+rules
+
+```
+
+
+The model is giving 271 rules.
+
+```{r}
+# We can perform an exploration of our model 
+ 
+summary(rules)
+```
+
+
+
+
+```{r}
+# Observing rules built in our model i.e. first 5 model rules
+# ---
+# 
+inspect(rules[1:5])
+
+```
+
+
+```{r}
+# Ordering these rules by a criteria such as the level of confidence
+# then looking at the first five rules.
+# We can also use different criteria such as: (by = "lift" or by = "support")
+# 
+rules<-sort(rules, by="confidence", decreasing=TRUE)
+inspect(rules[1:5])
+
+
+# ---
+```
+
+### Recommendations
+
+When the marketing tea is devising on the marketing strategy it should consider the support, confidence and the relationship of the product to others in order to expose the items in a near reach of the customers and also entice the customers. For example, yogurt should be placed near cookies, low.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

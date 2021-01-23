@@ -1,0 +1,207 @@
+---
+title: 'Part 4: Anomaly Detection'
+author: "Allan Mutisya"
+date: "1/23/2021"
+output: html_document
+---
+
+```{r}
+#  locale workaround
+my_locale <- Sys.getlocale("LC_ALL")
+Sys.setlocale("LC_ALL", my_locale)
+```
+# Advertisement
+
+## 1. Defining the question
+
+### a) Specifying the Question
+performing various unsupervised learning techniques and later providing recommendations based on your insights to the marketing departent
+
+### b) Defining the Metric for Success
+
+The analysis will be considered a success when the high dimensional data will be reduced to a low dimension data.
+
+### c) Understanding the context
+
+The role of the analysis is to inform the marketing department on the most relevant marketing strategies that will result in the highest no. of sales.
+
+### d) Recording the Experimental Design
+
+1. Defining the research question
+
+2. Data Understanding
+
+3. Data cleaning
+
+4. Modeling
+
+5. Recommendations
+
+### e) Data Relevance
+
+The datasets are large enough to be used for Exploratory Data Analysis, thus promising better outcomes.
+
+### f) Reading the Data
+
+```{r}
+# loading the dataset
+library(readr)
+sa <- read_csv("C:/Users/ALLANOOH/Documents/moringa/R/IP's/Carrefour/Supermarket_Sales_Forecasting - Sales.csv")
+
+```
+
+
+
+```{r}
+# Load tidyverse and anomalize
+# ---
+# 
+library(tidyverse)
+library(anomalize)
+```
+
+
+```{r}
+# previewing the dataset
+head(sa)
+```
+
+### 3 Data Cleaning
+```{r}
+# dropping the null values
+sup_2 <- drop_na(sa)
+sum(is.na(sip_2))
+```
+
+```{r}
+#  groupby
+su <- sup_2 %>% group_by(Date)
+str(su)
+head(su)
+```
+
+
+### 4. Modeling
+```{r}
+## STL Decomposition Method
+
+sa %>%
+    head(10) %>%
+    knitr::kable()
+p1 <- sup %>%
+    time_decompose(Sales, 
+                   method    = "stl",
+                   frequency = "1 week",
+                   trend     = "3 months") %>%
+    anomalize(remainder) %>%
+    plot_anomaly_decomposition() +
+    ggtitle("# STL Decomposition Method")
+p1
+```
+
+
+```{r}
+# Twitter Decomposition Method
+p2 <- sa %>%
+    time_decompose(Sales, 
+                   method    = "twitter",
+                   frequency = "1 week",
+                   trend     = "3 months") %>%
+    anomalize(remainder) %>%
+    plot_anomaly_decomposition() +
+    ggtitle("Twitter Decomposition")
+p2
+```
+
+
+
+We can see that the season components for both STL and Twitter decomposition are exactly the same
+
+### Recommendations
+
+The marketing team should have a great look on the months with the red dots our data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
